@@ -88,7 +88,7 @@ fig = px.scatter(
     animation_frame='time_ms',
     text=df['comb']
 )
-# pyo.plot(fig)
+pyo.plot(fig)
 # %%
 # x = [df['g_lat']]
 # y = [df['g_long']]
@@ -227,6 +227,7 @@ pyo.plot(fig_cam)
 df['ms_corr'] = df['time_ms'] - 789410
 df['s_corr'] = df['ms_corr'] / 1000
 df['s_corr']
+
 fig = make_subplots(rows=2, cols=2, shared_xaxes=True)
 
 fig.add_trace(
@@ -294,10 +295,10 @@ fig.update_layout(
     )
 )
 
-pyo.plot(fig)
+# pyo.plot(fig)
 # %%
 
-fig.write_html('multi.html', include_plotlyjs=False)
+fig.write_html('templates/multi_js1.html')
 
 # %%
 fig = go.Figure(data=[go.Table(
@@ -387,9 +388,9 @@ t1 = px.scatter([df_iats[511:]],
 pyo.plot(fig)
 # %%
 
-s1 = df_iats[df_iats['time_ms'].between(9726, 12352)][['iat2', 'iat', 'rpm', 'tpedal']][:-14].reset_index()
+s1 = df[df['time_ms'].between(9726, 12352)][['iat2', 'iat', 'rpm', 'tpedal']][:-14].reset_index()
 
-s2 = df_iats[df_iats['time_ms'].between(22345, 25221)][['iat2', 'iat', 'rpm', 'tpedal']].reset_index()
+s2 = df[df['time_ms'].between(22345, 25221)][['iat2', 'iat', 'rpm', 'tpedal']].reset_index()
 
 s1['run'] = '1'
 s2['run'] = '2'
@@ -404,7 +405,7 @@ fig = px.scatter(
 
 fig = px.scatter(s1, x='rpm', y=['iat2', 'iat'])
 fig2 = px.scatter(s2, x='rpm', y=['iat2', 'iat'])
-fig.add_scatter(s2, x=, y='iat2', )
+# fig.add_scatter(s2, x=, y='iat2', )
 # %%
 # ses = s1.concat(s2, axis=1, ignore_index=True, sort=False)
 # ses = s1.append(s2, ignore_index=True)
@@ -416,7 +417,7 @@ fig = make_subplots()
 # trace2= go.Scatter(x=s2['rpm'],y=s2['iat'],connectgaps=True)
 # fig = px.scatter(trace2)
 # fig = go.Figure()
-# fig1 = px.scatter(s1, x='rpm', y=['iat2', 'iat'], trendline='lowess')
+fig1 = px.scatter(s1, x='rpm', y=['iat2', 'iat'], trendline='lowess')
 # fig.add_trace(trace1)
 # fig = px.scatter(s1, x='rpm', y=['iat2', 'iat'], trendline='rolling')
 # fig = px.scatter(s2, x='rpm', y=['iat2', 'iat'], trendline='lowess')
@@ -427,17 +428,17 @@ t1 = go.Scatter(
     y=s1['iat2']
 )
 
-t2 = px.scatter(
+t2 = go.Scatter(
     x=s1['rpm'],
     y=s1['iat']
 )
 fig = go.Figure()
-fig.add_trace([t1])
-fig.add_trace([t2])
+fig.add_trace(t1)
+fig.add_trace(t2)
 # fig.add_trace([t2])
 pyo.plot(fig)
 # %%
-# fig = px.scatter(s2, x='rpm', y=['iat2', 'iat'], trendline='lowess')
+fig = px.scatter(s2, x='rpm', y=['iat2', 'iat'], trendline='lowess')
 l0 = s1['iat2'].to_list()
 l1 = s1['iat'].to_list()
 l2 = s2['iat2'].to_list()
@@ -462,14 +463,14 @@ print(l)
 # %%
 
 df = pd.read_sql('SELECT * FROM gfb', con)
-# d = px.scatter_ternary(a=df_iats['steer_ang'], b=df_iats['tc_r'], c=df_iats['tpedal'])
-# d = px.scatter_ternary(a=df_iats['iat'], b=df_iats['k_level'], c=df_iats['iat2'])
+d = px.scatter_ternary(a=df['steer_ang'], b=df['tc_r'], c=df['tpedal'])
+# d = px.scatter_ternary(a=df['iat'], b=df['k_level'], c=df['iat2'])
 g = px.line(df, x='frame', y=['tpedal', 'steer_ang'])
 
 # g.add_vrect(l.index[0], l.index[-1], annotation_text='tc')
-pyo.plot(g)
+pyo.plot(d)
 
-#%%
+# %%
 tc = [[1569, 1617],
       [1640, 1659],
       [1667, 1673],
@@ -515,7 +516,6 @@ z = list(zip(lf, ll))
 
 df = pd.read_sql('SELECT * FROM gfb', con)
 
-
 g = px.line(df, x='frame', y=['tpedal', 'steer_ang'])
 # %%
 
@@ -525,20 +525,18 @@ for x in range(len(tc)):
 
 g.update_layout(
     xaxis=dict(
-        range=[0,3200], rangeslider=dict(autorange=True)
+        range=[0, 3200], rangeslider=dict(autorange=True)
     ),
     showlegend=True,
-title='Activity of traction control as steering angle and throttle position vary'
+    title='Activity of traction control as steering angle and throttle position vary'
 )
-
-
-
 
 pyo.plot(g)
 
 # %%
 
 g.write_html('tc.html', include_plotlyjs=False)
+
 
 def add_tc():
     for x in range(len(tc)):
@@ -550,8 +548,22 @@ def add_tc():
             line_width=0
         )
 
-#%%
+
+# %%
 for i in range(len(tc)):
     g.add_vrect(tc[i][0], tc[i][1], visible=False)
 
 pyo.plot(g)
+
+# %%
+
+df = pd.read_sql('SELECT * FROM gfb')
+
+fig = go.Figure(
+    data=[go.contourcarpet()]
+)
+
+# %%
+pi = 't h i s s h i t'.split()
+
+'.'.join(pi)

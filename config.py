@@ -10,10 +10,10 @@ class Config:
     """Flask configuration variables."""
 
     # General Config
-    FLASK_APP = 'app.py'
-    FLASK_ENV = environ.get('FLASK_ENV')
+    FLASK_APP = 'app'
+    FLASK_ENV = "development"
     # SECRET_KEY = environ.get('SECRET_KEY')
     # Static Assets
     STATIC_FOLDER = 'static'
     TEMPLATES_FOLDER = 'templates'
-    # COMPRESSOR_DEBUG = environ.get('COMPRESSOR_DEBUG')
+    COMPRESSOR_DEBUG = environ.get('COMPRESSOR_DEBUG')
