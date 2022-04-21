@@ -563,7 +563,4 @@ fig = go.Figure(
     data=[go.contourcarpet()]
 )
 
-# %%
-pi = 't h i s s h i t'.split()
 
-'.'.join(pi)
